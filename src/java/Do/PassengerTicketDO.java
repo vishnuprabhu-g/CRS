@@ -10,7 +10,7 @@ import java.util.List;
 public class PassengerTicketDO{
 public void add(PassengerTicket obj) throws SQLException{
 Connection con=util.ConnectionUtil.getConnection();
-String q="insert into passenger_ticket (pnr ,journey_id ,from_station ,to_station ,total_fare ,total_adult ,total_children ,timestamp ) values (? , ?, ?, ?, ?, ?, ?, ? )";
+String q="insert into passenger_tickets (pnr ,journey_id ,from_id ,to_id ,total_fare ,total_adult ,total_children ) values (? , ?, ?, ?, ?, ?, ?)";
 PreparedStatement ps=con.prepareStatement(q);
 ps.setLong(1,obj.pnr);
 ps.setLong(2,obj.journeyId);
@@ -19,7 +19,7 @@ ps.setLong(4,obj.toStation);
 ps.setInt(5,obj.totalFare);
 ps.setInt(6,obj.totalAdult);
 ps.setInt(7,obj.totalChildren);
-ps.setLong(8,obj.timestamp);
+//ps.setLong(8,obj.timestamp);
 ps.executeUpdate();
 }
 

@@ -1,6 +1,6 @@
 <html>
     <body>
-        <form action="../BookTest" id="frm">
+        <form action="../BookT" id="frm">
             <table class="table table-bordered">
                 <thead>
                     <tr>

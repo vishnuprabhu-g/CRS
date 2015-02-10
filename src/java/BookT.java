@@ -4,12 +4,16 @@
  */
 
 import Do.PassengerDO;
+import Do.PassengerTicketDO;
 import Do.TrainClassSeatStatusDO;
 import Domain.Passenger;
+import Domain.PassengerTicket;
 import Domain.TrainClassSeatStatus;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +40,7 @@ public class BookT extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
-            long tcs = Long.parseLong(request.getParameter("tcs"));
+            long tcs =1;
             int count = 7;
             String name[] = new String[count];
             int age[] = new int[count];
@@ -56,13 +60,18 @@ public class BookT extends HttpServlet {
             TrainClassSeatStatusDO tcsdo = new TrainClassSeatStatusDO();
             PassengerDO pdo = new PassengerDO();
             long pnr = System.currentTimeMillis();
+            List<Passenger> queue = new ArrayList();
+            
+            boolean stop = false;
             for (int j = 0; j < i; j++) {
                 TrainClassSeatStatus tcss = tcsdo.getPref(tcs, pref[j]);
                 if (tcss == null) {
                     System.out.println("Required berth not available..!");
+                    stop = true;
                 } else {
                     tcss.pnr = pnr;
                     tcss.availability = false;
+                    
                     Passenger p = new Passenger();
                     p.age = age[j];
                     p.gender = gen[j];
@@ -70,13 +79,40 @@ public class BookT extends HttpServlet {
                     p.pnr = pnr;
                     p.sno = 101;
                     p.currentSeat = tcss.seatNo;
-                    pdo.add(p);
-                    tcsdo.update(tcss);
+                    p.currentSeat=tcss.seatNo;
+                    p.status=1;
+                    queue.add(p);
                 }
+            }
+            if (!stop) {
+                
+                PassengerTicket pt=new PassengerTicket();
+                pt.pnr=pnr;
+                pt.timestamp=System.currentTimeMillis();
+                pt.totalAdult=i;
+                pt.fromStation=1L;pt.toStation=1L;pt.totalChildren=0;pt.totalFare=1;pt.journeyId=1L;
+                PassengerTicketDO ptdo=new PassengerTicketDO();
+                
+                ptdo.add(pt);
+                
+                for (Passenger pss : queue) {
+                    pdo.add(pss);
+                }
+                
+                out.println("PNR:"+pt.pnr);
+                for(Passenger p:queue)
+                {
+                    out.println("Name:"+p.name+" seat:"+p.currentSeat);
+                }
+            }
+            else
+            {
+                out.println("exit");
+                out.close();
             }
             
         } catch (SQLException e) {
-            System.out.println(e);
+            out.println(e);
         } finally {
             out.close();
         }
